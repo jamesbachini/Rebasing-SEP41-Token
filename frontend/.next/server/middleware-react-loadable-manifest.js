@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"lib/wallet.ts -> @creit.tech/stellar-wallets-kit\":{\"id\":\"lib/wallet.ts -> @creit.tech/stellar-wallets-kit\",\"files\":[\"static/chunks/_app-pages-browser_node_modules_creit_tech_stellar-wallets-kit_index_mjs.js\"]}}"
+self.__REACT_LOADABLE_MANIFEST="{}"

@@ -18,7 +18,6 @@ type Bigish = bigint | null;
 
 export default function HomePage() {
   const [account, setAccount] = useState<string>("");
-  const [walletKit, setWalletKit] = useState<any>(null);
   const [status, setStatus] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [busy, setBusy] = useState<boolean>(false);
@@ -116,8 +115,7 @@ export default function HomePage() {
     setError("");
     setStatus("Connecting wallet...");
     try {
-      const { kit, publicKey } = await connectWallet(config.network);
-      setWalletKit(kit);
+      const { publicKey } = await connectWallet(config.network);
       setAccount(publicKey);
       setStatus("Wallet connected.");
       await refreshBalances();
@@ -129,7 +127,6 @@ export default function HomePage() {
 
   const onDisconnect = () => {
     setAccount("");
-    setWalletKit(null);
     setStatus("");
     setRusdBalance(null);
     setUsdcBalance(null);
@@ -139,7 +136,7 @@ export default function HomePage() {
   };
 
   const onApprove = async () => {
-    if (!account || !walletKit) {
+    if (!account) {
       return;
     }
     const amount = parseAmount(mintAmount, decimals);
@@ -164,7 +161,8 @@ export default function HomePage() {
         ],
         source: account,
         network: config.network,
-        sign: (xdr, passphrase) => signTransaction(walletKit, xdr, passphrase)
+        sign: (xdr, passphrase) =>
+          signTransaction(xdr, passphrase, account, config.network)
       });
       setStatus("Approval confirmed.");
       await refreshBalances();
@@ -176,7 +174,7 @@ export default function HomePage() {
   };
 
   const onMint = async () => {
-    if (!account || !walletKit) {
+    if (!account) {
       return;
     }
     const amount = parseAmount(mintAmount, decimals);
@@ -194,7 +192,8 @@ export default function HomePage() {
         args: [toScValAddress(account), toScValI128(amount)],
         source: account,
         network: config.network,
-        sign: (xdr, passphrase) => signTransaction(walletKit, xdr, passphrase)
+        sign: (xdr, passphrase) =>
+          signTransaction(xdr, passphrase, account, config.network)
       });
       setStatus("Mint confirmed.");
       setMintAmount("");
@@ -207,7 +206,7 @@ export default function HomePage() {
   };
 
   const onBurn = async () => {
-    if (!account || !walletKit) {
+    if (!account) {
       return;
     }
     const amount = parseAmount(burnAmount, decimals);
@@ -225,7 +224,8 @@ export default function HomePage() {
         args: [toScValAddress(account), toScValI128(amount)],
         source: account,
         network: config.network,
-        sign: (xdr, passphrase) => signTransaction(walletKit, xdr, passphrase)
+        sign: (xdr, passphrase) =>
+          signTransaction(xdr, passphrase, account, config.network)
       });
       setStatus("Burn confirmed.");
       setBurnAmount("");
@@ -266,7 +266,7 @@ export default function HomePage() {
                 </button>
               ) : (
                 <button className="secondary" onClick={onConnect}>
-                  Connect Freighter
+                  Connect Wallet
                 </button>
               )}
               <button className="ghost" onClick={refreshBalances} disabled={!account}>
