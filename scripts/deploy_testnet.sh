@@ -10,34 +10,49 @@ RPC_URL="https://rpc-testnet.stellar.org"
 PASSPHRASE="Test SDF Network ; September 2015"
 USDC_CONTRACT_ID="CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA"
 
-IDENTITY="${SOROBAN_IDENTITY:-rusd-deployer}"
-SECRET_KEY="${SOROBAN_SECRET_KEY:-}"
+IDENTITY="${STELLAR_IDENTITY:-${SOROBAN_IDENTITY:-james}}"
+SECRET_KEY="${STELLAR_SECRET_KEY:-${SOROBAN_SECRET_KEY:-}}"
 
-if ! command -v soroban >/dev/null 2>&1; then
-  echo "soroban CLI not found. Install it first."
+if command -v stellar >/dev/null 2>&1; then
+  CLI_BIN="stellar"
+  SOURCE_FLAG="--source-account"
+  WASM_TARGET="wasm32v1-none"
+elif command -v soroban >/dev/null 2>&1; then
+  CLI_BIN="soroban"
+  SOURCE_FLAG="--source"
+  WASM_TARGET="wasm32-unknown-unknown"
+else
+  echo "Stellar CLI not found. Install it first."
   exit 1
 fi
 
-if ! soroban network ls | rg -q "^${NETWORK}\\b"; then
-  soroban network add \
-    --network "${NETWORK}" \
-    --rpc-url "${RPC_URL}" \
-    --network-passphrase "${PASSPHRASE}"
+if ! ${CLI_BIN} network ls | grep -Eq "^${NETWORK}\\b"; then
+  if [[ "${CLI_BIN}" == "stellar" ]]; then
+    ${CLI_BIN} network add \
+      --rpc-url "${RPC_URL}" \
+      --network-passphrase "${PASSPHRASE}" \
+      "${NETWORK}"
+  else
+    ${CLI_BIN} network add \
+      --network "${NETWORK}" \
+      --rpc-url "${RPC_URL}" \
+      --network-passphrase "${PASSPHRASE}"
+  fi
 fi
 
 if [[ -n "${SECRET_KEY}" ]]; then
-  soroban keys add --secret-key "${SECRET_KEY}" "${IDENTITY}" --overwrite
+  ${CLI_BIN} keys add --secret-key "${SECRET_KEY}" "${IDENTITY}" --overwrite
 else
-  if ! soroban keys ls | rg -q "^${IDENTITY}\\b"; then
-    echo "Missing identity '${IDENTITY}'. Set SOROBAN_SECRET_KEY or create the identity."
+  if ! ${CLI_BIN} keys ls | grep -Eq "^${IDENTITY}\\b"; then
+    echo "Missing identity '${IDENTITY}'. Set STELLAR_SECRET_KEY (or SOROBAN_SECRET_KEY) or create the identity."
     exit 1
   fi
 fi
 
 echo "Building contract..."
-soroban contract build --manifest-path "${CONTRACTS_DIR}/Cargo.toml"
+${CLI_BIN} contract build --manifest-path "${CONTRACTS_DIR}/Cargo.toml"
 
-WASM_PATH="${CONTRACTS_DIR}/target/wasm32-unknown-unknown/release/rusd_rebasing_token.wasm"
+WASM_PATH="${CONTRACTS_DIR}/target/${WASM_TARGET}/release/rusd_rebasing_token.wasm"
 if [[ ! -f "${WASM_PATH}" ]]; then
   echo "WASM not found at ${WASM_PATH}"
   exit 1
@@ -45,16 +60,16 @@ fi
 
 echo "Deploying contract..."
 RUSD_CONTRACT_ID="$(
-  soroban contract deploy \
+  ${CLI_BIN} contract deploy \
     --wasm "${WASM_PATH}" \
-    --source "${IDENTITY}" \
+    ${SOURCE_FLAG} "${IDENTITY}" \
     --network "${NETWORK}"
 )"
 
 echo "Initializing contract..."
-soroban contract invoke \
+${CLI_BIN} contract invoke \
   --id "${RUSD_CONTRACT_ID}" \
-  --source "${IDENTITY}" \
+  ${SOURCE_FLAG} "${IDENTITY}" \
   --network "${NETWORK}" \
   -- \
   init \
@@ -70,7 +85,7 @@ update_env() {
   if [[ ! -f "${file}" ]]; then
     touch "${file}"
   fi
-  if rg -q "^${key}=" "${file}"; then
+  if grep -q "^${key}=" "${file}"; then
     sed -i "s|^${key}=.*|${key}=${value}|" "${file}"
   else
     echo "${key}=${value}" >> "${file}"
