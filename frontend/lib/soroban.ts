@@ -2,10 +2,10 @@ import {
   BASE_FEE,
   Contract,
   Networks,
-  SorobanRpc,
   TransactionBuilder,
   scValToNative,
-  nativeToScVal
+  nativeToScVal,
+  rpc
 } from "@stellar/stellar-sdk";
 
 import { config, NetworkKey } from "./config";
@@ -28,7 +28,7 @@ export function getNetworkPassphrase(network: NetworkKey) {
 
 export function getServer() {
   const allowHttp = config.rpcUrl.startsWith("http://");
-  return new SorobanRpc.Server(config.rpcUrl, { allowHttp });
+  return new rpc.Server(config.rpcUrl, { allowHttp });
 }
 
 export function toScValI128(value: I128Like) {
@@ -63,7 +63,7 @@ export async function readContractValue(
     .build();
 
   const sim = await server.simulateTransaction(tx);
-  if (SorobanRpc.isSimulationError(sim)) {
+  if (rpc.Api.isSimulationError(sim)) {
     throw new Error(sim.error);
   }
   const retval = sim.result?.retval;

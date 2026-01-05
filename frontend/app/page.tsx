@@ -42,6 +42,10 @@ export default function HomePage() {
     return amount > 0n && usdcAllowance < amount;
   }, [usdcAllowance, mintAmount, decimals]);
 
+  const hasAllowance = useMemo(() => {
+    return usdcAllowance !== null && usdcAllowance > 0n;
+  }, [usdcAllowance]);
+
   const exchangeRate = useMemo(() => {
     if (!underlyingBalance || !totalSupply || totalSupply === 0n) {
       return "1.000000";
@@ -133,6 +137,30 @@ export default function HomePage() {
     setUsdcAllowance(null);
     setUnderlyingBalance(null);
     setTotalSupply(null);
+  };
+
+  const copyToClipboard = async (value: string, label: string) => {
+    if (!value) {
+      return;
+    }
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      setStatus(`${label} address copied.`);
+      setError("");
+    } catch (err: any) {
+      setError(err?.message || `Failed to copy ${label} address.`);
+    }
   };
 
   const onApprove = async () => {
@@ -243,7 +271,7 @@ export default function HomePage() {
         <section className="hero">
           <div>
             <div className="pill">rUSD Rebasing Token</div>
-            <h1>Yield appears as balance growth.</h1>
+            <h1>Watch Your Stablecoin Balance Increase In Your Wallet</h1>
             <p>
               Deposit USDC, mint rUSD, and watch balances expand automatically when
               underlying USDC lands in the contract.
@@ -259,7 +287,7 @@ export default function HomePage() {
               <span className="label">Account</span>
               <span className="value">{account ? shorten(account) : "Not connected"}</span>
             </div>
-            <div className="split">
+            <div className="split wallet-actions">
               {account ? (
                 <button className="ghost" onClick={onDisconnect}>
                   Disconnect
@@ -276,9 +304,13 @@ export default function HomePage() {
           </div>
         </section>
 
-        {envIssue ? <div className="status">{envIssue}</div> : null}
-        {status ? <div className="status">{status}</div> : null}
-        {error ? <div className="status">{error}</div> : null}
+        {envIssue || status || error ? (
+          <div className="status-stack">
+            {envIssue ? <div className="status">{envIssue}</div> : null}
+            {status ? <div className="status">{status}</div> : null}
+            {error ? <div className="status">{error}</div> : null}
+          </div>
+        ) : null}
 
         <section className="grid">
           <div className="panel">
@@ -316,13 +348,24 @@ export default function HomePage() {
                 placeholder="Amount in rUSD"
                 inputMode="decimal"
               />
-              <button
-                className="primary"
-                onClick={needsApproval ? onApprove : onMint}
-                disabled={!account || busy}
-              >
-                {needsApproval ? "Approve USDC" : "Mint rUSD"}
-              </button>
+              {hasAllowance ? (
+                <div className="button-row">
+                  <button className="ghost" onClick={onApprove} disabled={!account || busy}>
+                    Approve More
+                  </button>
+                  <button
+                    className="primary"
+                    onClick={onMint}
+                    disabled={!account || busy || needsApproval}
+                  >
+                    Mint rUSD
+                  </button>
+                </div>
+              ) : (
+                <button className="primary" onClick={onApprove} disabled={!account || busy}>
+                  Approve USDC
+                </button>
+              )}
               <div className="stat">
                 <span className="label">USDC allowance</span>
                 <span className="value">
@@ -356,8 +399,20 @@ export default function HomePage() {
 
         <section className="footer">
           <div className="split">
-            <span className="tag">USDC: {shorten(config.usdcContractId)}</span>
-            <span className="tag">rUSD: {shorten(config.rusdContractId)}</span>
+            <button
+              type="button"
+              className="tag"
+              onClick={() => copyToClipboard(config.usdcContractId, "USDC")}
+            >
+              USDC: {shorten(config.usdcContractId)}
+            </button>
+            <button
+              type="button"
+              className="tag"
+              onClick={() => copyToClipboard(config.rusdContractId, "rUSD")}
+            >
+              rUSD: {shorten(config.rusdContractId)}
+            </button>
             <span className="tag">RPC: {config.rpcUrl || "unset"}</span>
           </div>
         </section>

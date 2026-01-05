@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST="{\"lib/wallet.ts -> @creit-tech/stellar-wallets-kit/modules/utils\":{\"id\":\"lib/wallet.ts -> @creit-tech/stellar-wallets-kit/modules/utils\",\"files\":[\"static/chunks/_app-pages-browser_node_modules_creit-tech_stellar-wallets-kit_sdk_modules_utils_js.js\"]},\"lib/wallet.ts -> @creit-tech/stellar-wallets-kit/sdk\":{\"id\":\"lib/wallet.ts -> @creit-tech/stellar-wallets-kit/sdk\",\"files\":[\"static/chunks/_app-pages-browser_node_modules_creit-tech_stellar-wallets-kit_sdk_mod_js.js\"]}}"

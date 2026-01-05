@@ -2,15 +2,15 @@
 
 :root {
   color-scheme: light;
-  --bg: #f4efe8;
-  --bg-deep: #efe3d2;
+  --bg: #f2ece3;
+  --bg-deep: #eadfce;
   --ink: #1b1b1b;
   --ink-soft: rgba(27, 27, 27, 0.65);
-  --accent: #f15a29;
+  --accent: #e06a3d;
   --accent-2: #007c74;
   --card: rgba(255, 255, 255, 0.7);
   --stroke: rgba(27, 27, 27, 0.12);
-  --shadow: 0 24px 50px rgba(27, 27, 27, 0.08);
+  --shadow: 0 24px 40px rgba(27, 27, 27, 0.08);
   --radius: 24px;
   --radius-sm: 14px;
 }
@@ -22,15 +22,36 @@
 body {
   margin: 0;
   font-family: "Space Grotesk", system-ui, sans-serif;
-  background: radial-gradient(circle at top, #fff6ec 0%, var(--bg) 60%),
-    radial-gradient(circle at 20% 20%, rgba(0, 124, 116, 0.12), transparent 55%),
-    radial-gradient(circle at 80% 10%, rgba(241, 90, 41, 0.16), transparent 45%);
+  background: radial-gradient(circle at top, #fff7ed 0%, var(--bg) 55%),
+    radial-gradient(circle at 20% 15%, rgba(0, 124, 116, 0.14), transparent 55%),
+    radial-gradient(circle at 85% 5%, rgba(224, 106, 61, 0.18), transparent 45%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(242, 236, 227, 0.9));
   color: var(--ink);
   min-height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.6), transparent 55%),
+    repeating-linear-gradient(
+      125deg,
+      rgba(27, 27, 27, 0.03) 0px,
+      rgba(27, 27, 27, 0.03) 1px,
+      transparent 1px,
+      transparent 10px
+    );
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
 }
 
 main {
   padding: 32px 24px 80px;
+  position: relative;
+  z-index: 1;
 }
 
 .page {
@@ -51,6 +72,7 @@ main {
   font-size: clamp(2.4rem, 4vw, 4rem);
   font-weight: 400;
   margin: 0;
+  line-height: 1.05;
   letter-spacing: -0.02em;
 }
 
@@ -67,7 +89,7 @@ main {
   gap: 10px;
   padding: 10px 16px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.8);
   border: 1px solid var(--stroke);
   font-size: 0.9rem;
 }
@@ -79,7 +101,7 @@ main {
 }
 
 .panel {
-  background: var(--card);
+  background: rgba(255, 255, 255, 0.75);
   border-radius: var(--radius);
   border: 1px solid var(--stroke);
   padding: 22px;
@@ -126,6 +148,20 @@ main {
   gap: 12px;
 }
 
+.button-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.wallet-actions {
+  margin-top: 10px;
+}
+
 input {
   padding: 12px 14px;
   border-radius: var(--radius-sm);
@@ -150,9 +186,9 @@ button:disabled {
 }
 
 .primary {
-  background: var(--accent);
+  background: linear-gradient(135deg, #e7774f 0%, #d95d35 100%);
   color: #fff;
-  box-shadow: 0 16px 30px rgba(241, 90, 41, 0.25);
+  box-shadow: 0 14px 26px rgba(217, 93, 53, 0.22);
 }
 
 .secondary {
@@ -178,6 +214,12 @@ button:hover:not(:disabled) {
   border: 1px solid var(--stroke);
   color: var(--ink-soft);
   font-size: 0.9rem;
+}
+
+.status-stack {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 20px;
 }
 
 .footer {
