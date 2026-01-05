@@ -1,0 +1,223 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap");
+
+:root {
+  color-scheme: light;
+  --bg: #f4efe8;
+  --bg-deep: #efe3d2;
+  --ink: #1b1b1b;
+  --ink-soft: rgba(27, 27, 27, 0.65);
+  --accent: #f15a29;
+  --accent-2: #007c74;
+  --card: rgba(255, 255, 255, 0.7);
+  --stroke: rgba(27, 27, 27, 0.12);
+  --shadow: 0 24px 50px rgba(27, 27, 27, 0.08);
+  --radius: 24px;
+  --radius-sm: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  background: radial-gradient(circle at top, #fff6ec 0%, var(--bg) 60%),
+    radial-gradient(circle at 20% 20%, rgba(0, 124, 116, 0.12), transparent 55%),
+    radial-gradient(circle at 80% 10%, rgba(241, 90, 41, 0.16), transparent 45%);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+main {
+  padding: 32px 24px 80px;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  align-items: center;
+  margin-bottom: 36px;
+}
+
+.hero h1 {
+  font-family: "Instrument Serif", serif;
+  font-size: clamp(2.4rem, 4vw, 4rem);
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  margin: 12px 0 0;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  max-width: 520px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--stroke);
+  font-size: 0.9rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.panel {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--stroke);
+  padding: 22px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+  animation: rise 0.7s ease both;
+}
+
+.panel:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.panel:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.panel h2 {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--stroke);
+  font-size: 0.98rem;
+}
+
+.stat:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: var(--ink-soft);
+}
+
+.value {
+  font-weight: 600;
+}
+
+.action {
+  display: grid;
+  gap: 12px;
+}
+
+input {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--stroke);
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+button {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 16px 30px rgba(241, 90, 41, 0.25);
+}
+
+.secondary {
+  background: #1e1e1e;
+  color: #fff;
+}
+
+.ghost {
+  background: transparent;
+  border: 1px solid var(--stroke);
+  color: var(--ink);
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 30px rgba(27, 27, 27, 0.18);
+}
+
+.status {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--stroke);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.footer {
+  margin-top: 40px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.split {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 720px) {
+  main {
+    padding: 24px 16px 64px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+}
