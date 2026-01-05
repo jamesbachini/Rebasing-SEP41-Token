@@ -263,6 +263,95 @@ fn burn_redeems_usdc() {
 }
 
 #[test]
+fn rebase_fair_share_after_activity_three_users() {
+    let (env, usdc_id, rusd_id, alice, bob, donor, ..) = setup();
+    let carol = Address::generate(&env);
+    let usdc = UsdcMockClient::new(&env, &usdc_id);
+    let rusd = RUsdTokenClient::new(&env, &rusd_id);
+
+    usdc.mint(&alice, &1_000);
+    usdc.mint(&bob, &1_000);
+    usdc.mint(&carol, &1_000);
+    usdc.mint(&donor, &1_000);
+
+    let mut underlying: i128 = 0;
+    let mut total_shares: i128 = 0;
+    let mut alice_shares: i128 = 0;
+    let mut bob_shares: i128 = 0;
+    let mut carol_shares: i128 = 0;
+
+    usdc.approve(&alice, &rusd_id, &100, &200);
+    rusd.mint(&alice, &100);
+    let shares_to_mint = model_shares_from_rusd(100, total_shares, underlying);
+    alice_shares += shares_to_mint;
+    total_shares += shares_to_mint;
+    underlying += 100;
+    assert_eq!(usdc.balance(&rusd_id), underlying);
+
+    usdc.approve(&bob, &rusd_id, &60, &200);
+    rusd.mint(&bob, &60);
+    let shares_to_mint = model_shares_from_rusd(60, total_shares, underlying);
+    bob_shares += shares_to_mint;
+    total_shares += shares_to_mint;
+    underlying += 60;
+    assert_eq!(usdc.balance(&rusd_id), underlying);
+
+    usdc.approve(&carol, &rusd_id, &40, &200);
+    rusd.mint(&carol, &40);
+    let shares_to_mint = model_shares_from_rusd(40, total_shares, underlying);
+    carol_shares += shares_to_mint;
+    total_shares += shares_to_mint;
+    underlying += 40;
+    assert_eq!(usdc.balance(&rusd_id), underlying);
+
+    rusd.transfer(&bob, &carol, &15);
+    let shares_to_move = model_shares_from_rusd(15, total_shares, underlying);
+    bob_shares -= shares_to_move;
+    carol_shares += shares_to_move;
+
+    rusd.burn(&alice, &20);
+    let shares_to_burn = model_shares_from_rusd(20, total_shares, underlying);
+    let usdc_out = model_rusd_from_shares(shares_to_burn, total_shares, underlying);
+    alice_shares -= shares_to_burn;
+    total_shares -= shares_to_burn;
+    underlying -= usdc_out;
+    assert_eq!(usdc.balance(&rusd_id), underlying);
+
+    usdc.approve(&carol, &rusd_id, &25, &200);
+    rusd.mint(&carol, &25);
+    let shares_to_mint = model_shares_from_rusd(25, total_shares, underlying);
+    carol_shares += shares_to_mint;
+    total_shares += shares_to_mint;
+    underlying += 25;
+    assert_eq!(usdc.balance(&rusd_id), underlying);
+
+    let alice_before = rusd.balance(&alice);
+    let bob_before = rusd.balance(&bob);
+    let carol_before = rusd.balance(&carol);
+
+    usdc.transfer(&donor, &rusd_id, &17);
+    underlying += 17;
+    assert_eq!(usdc.balance(&rusd_id), underlying);
+
+    let expected_alice = model_rusd_from_shares(alice_shares, total_shares, underlying);
+    let expected_bob = model_rusd_from_shares(bob_shares, total_shares, underlying);
+    let expected_carol = model_rusd_from_shares(carol_shares, total_shares, underlying);
+
+    assert_eq!(rusd.balance(&alice), expected_alice);
+    assert_eq!(rusd.balance(&bob), expected_bob);
+    assert_eq!(rusd.balance(&carol), expected_carol);
+    assert_eq!(rusd.total_supply(), underlying);
+
+    let expected_alice_gain = model_mul_div_floor(alice_shares, 17, total_shares);
+    let expected_bob_gain = model_mul_div_floor(bob_shares, 17, total_shares);
+    let expected_carol_gain = model_mul_div_floor(carol_shares, 17, total_shares);
+
+    assert_eq!(expected_alice - alice_before, expected_alice_gain);
+    assert_eq!(expected_bob - bob_before, expected_bob_gain);
+    assert_eq!(expected_carol - carol_before, expected_carol_gain);
+}
+
+#[test]
 #[ignore]
 fn zero_amount_mint_fails() {
     let (env, _usdc_id, rusd_id, alice, ..) = setup();
@@ -314,4 +403,33 @@ fn assert_contract_error(
         Err(Err(_)) => panic!("unexpected invoke error"),
         Ok(_) => panic!("expected contract error"),
     }
+}
+
+fn model_mul_div_floor(a: i128, b: i128, denom: i128) -> i128 {
+    let prod = a.checked_mul(b).expect("overflow");
+    prod / denom
+}
+
+fn model_mul_div_ceil(a: i128, b: i128, denom: i128) -> i128 {
+    let prod = a.checked_mul(b).expect("overflow");
+    let div = prod / denom;
+    if prod % denom == 0 {
+        div
+    } else {
+        div + 1
+    }
+}
+
+fn model_shares_from_rusd(amount: i128, total_shares: i128, underlying: i128) -> i128 {
+    if total_shares == 0 {
+        return amount;
+    }
+    model_mul_div_ceil(amount, total_shares, underlying)
+}
+
+fn model_rusd_from_shares(shares: i128, total_shares: i128, underlying: i128) -> i128 {
+    if total_shares == 0 || shares == 0 {
+        return 0;
+    }
+    model_mul_div_floor(shares, underlying, total_shares)
 }
