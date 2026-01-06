@@ -214,7 +214,7 @@ fn allowance_and_transfer_from() {
     usdc.approve(&alice, &rusd_id, &100, &200);
     rusd.mint(&alice, &100);
 
-    rusd.approve(&alice, &spender, &50);
+    rusd.approve(&alice, &spender, &50, &200);
     assert_eq!(rusd.allowance(&alice, &spender), 50);
 
     rusd.transfer_from(&spender, &alice, &bob, &20);

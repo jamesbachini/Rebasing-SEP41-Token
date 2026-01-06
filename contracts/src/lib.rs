@@ -1,9 +1,11 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, panic_with_error, token::Client as TokenClient,
-    Address, Env, String,
+    contract, contracterror, contractimpl, contracttype, panic_with_error,
+    token::Client as TokenClient, Address, Env, String,
 };
+use stellar_macros::default_impl;
+use stellar_tokens::fungible::{emit_mint, emit_transfer, Base, FungibleToken};
 
 #[contracterror]
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
@@ -12,7 +14,6 @@ pub enum Error {
     NotInitialized = 2,
     ZeroAmount = 3,
     InsufficientShares = 4,
-    InsufficientAllowance = 5,
     DivisionByZero = 6,
     Overflow = 7,
 }
@@ -21,9 +22,6 @@ pub enum Error {
 #[contracttype]
 pub struct Config {
     pub usdc_contract_id: Address,
-    pub name: String,
-    pub symbol: String,
-    pub decimals: u32,
 }
 
 #[derive(Clone)]
@@ -32,11 +30,91 @@ pub enum DataKey {
     Config,
     TotalShares,
     Shares(Address),
-    Allowance(Address, Address),
 }
 
 #[contract]
 pub struct RUsdToken;
+
+pub struct RebasingOverrides;
+
+impl stellar_tokens::fungible::ContractOverrides for RebasingOverrides {
+    fn total_supply(e: &Env) -> i128 {
+        let total_shares = read_total_shares(e);
+        if total_shares == 0 {
+            return 0;
+        }
+        let underlying = read_underlying(e);
+        rusd_from_shares(e, total_shares, total_shares, underlying)
+    }
+
+    fn balance(e: &Env, account: &Address) -> i128 {
+        let total_shares = read_total_shares(e);
+        if total_shares == 0 {
+            return 0;
+        }
+        let shares = read_shares(e, account);
+        if shares == 0 {
+            return 0;
+        }
+        let underlying = read_underlying(e);
+        rusd_from_shares(e, shares, total_shares, underlying)
+    }
+
+    fn transfer(e: &Env, from: &Address, to: &Address, amount: i128) {
+        require_positive_amount(e, amount);
+        from.require_auth();
+
+        let total_shares = read_total_shares(e);
+        let underlying = read_underlying(e);
+        let shares_to_move = shares_from_rusd(e, amount, total_shares, underlying);
+
+        let from_shares = read_shares(e, from);
+        if from_shares < shares_to_move {
+            panic_with_error!(e, Error::InsufficientShares);
+        }
+
+        let new_from_shares = from_shares
+            .checked_sub(shares_to_move)
+            .unwrap_or_else(|| panic_with_error!(e, Error::Overflow));
+        write_shares(e, from, new_from_shares);
+
+        let to_shares = read_shares(e, to);
+        let new_to_shares = to_shares
+            .checked_add(shares_to_move)
+            .unwrap_or_else(|| panic_with_error!(e, Error::Overflow));
+        write_shares(e, to, new_to_shares);
+
+        emit_transfer(e, from, to, amount);
+    }
+
+    fn transfer_from(e: &Env, spender: &Address, from: &Address, to: &Address, amount: i128) {
+        require_positive_amount(e, amount);
+        spender.require_auth();
+        Base::spend_allowance(e, from, spender, amount);
+
+        let total_shares = read_total_shares(e);
+        let underlying = read_underlying(e);
+        let shares_to_move = shares_from_rusd(e, amount, total_shares, underlying);
+
+        let from_shares = read_shares(e, from);
+        if from_shares < shares_to_move {
+            panic_with_error!(e, Error::InsufficientShares);
+        }
+
+        let new_from_shares = from_shares
+            .checked_sub(shares_to_move)
+            .unwrap_or_else(|| panic_with_error!(e, Error::Overflow));
+        write_shares(e, from, new_from_shares);
+
+        let to_shares = read_shares(e, to);
+        let new_to_shares = to_shares
+            .checked_add(shares_to_move)
+            .unwrap_or_else(|| panic_with_error!(e, Error::Overflow));
+        write_shares(e, to, new_to_shares);
+
+        emit_transfer(e, from, to, amount);
+    }
+}
 
 #[cfg(test)]
 mod test;
@@ -47,119 +125,9 @@ impl RUsdToken {
         if env.storage().instance().has(&DataKey::Config) {
             panic_with_error!(&env, Error::AlreadyInitialized);
         }
-        let config = Config {
-            usdc_contract_id,
-            name,
-            symbol,
-            decimals,
-        };
+        let config = Config { usdc_contract_id };
         env.storage().instance().set(&DataKey::Config, &config);
-    }
-
-    pub fn name(env: Env) -> String {
-        read_config(&env).name
-    }
-
-    pub fn symbol(env: Env) -> String {
-        read_config(&env).symbol
-    }
-
-    pub fn decimals(env: Env) -> u32 {
-        read_config(&env).decimals
-    }
-
-    pub fn balance(env: Env, owner: Address) -> i128 {
-        let total_shares = read_total_shares(&env);
-        if total_shares == 0 {
-            return 0;
-        }
-        let shares = read_shares(&env, &owner);
-        if shares == 0 {
-            return 0;
-        }
-        let underlying = read_underlying(&env);
-        rusd_from_shares(&env, shares, total_shares, underlying)
-    }
-
-    pub fn total_supply(env: Env) -> i128 {
-        let total_shares = read_total_shares(&env);
-        if total_shares == 0 {
-            return 0;
-        }
-        let underlying = read_underlying(&env);
-        rusd_from_shares(&env, total_shares, total_shares, underlying)
-    }
-
-    pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
-        require_positive_amount(&env, amount);
-        from.require_auth();
-
-        let total_shares = read_total_shares(&env);
-        let underlying = read_underlying(&env);
-        let shares_to_move = shares_from_rusd(&env, amount, total_shares, underlying);
-
-        let from_shares = read_shares(&env, &from);
-        if from_shares < shares_to_move {
-            panic_with_error!(&env, Error::InsufficientShares);
-        }
-
-        let new_from_shares = from_shares
-            .checked_sub(shares_to_move)
-            .unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
-        write_shares(&env, &from, new_from_shares);
-
-        let to_shares = read_shares(&env, &to);
-        let new_to_shares = to_shares
-            .checked_add(shares_to_move)
-            .unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
-        write_shares(&env, &to, new_to_shares);
-    }
-
-    pub fn approve(env: Env, owner: Address, spender: Address, amount: i128) {
-        owner.require_auth();
-        if amount < 0 {
-            panic_with_error!(&env, Error::ZeroAmount);
-        }
-        write_allowance(&env, &owner, &spender, amount);
-    }
-
-    pub fn allowance(env: Env, owner: Address, spender: Address) -> i128 {
-        read_allowance(&env, &owner, &spender)
-    }
-
-    pub fn transfer_from(env: Env, spender: Address, from: Address, to: Address, amount: i128) {
-        require_positive_amount(&env, amount);
-        spender.require_auth();
-
-        let allowance = read_allowance(&env, &from, &spender);
-        if allowance < amount {
-            panic_with_error!(&env, Error::InsufficientAllowance);
-        }
-
-        let total_shares = read_total_shares(&env);
-        let underlying = read_underlying(&env);
-        let shares_to_move = shares_from_rusd(&env, amount, total_shares, underlying);
-
-        let from_shares = read_shares(&env, &from);
-        if from_shares < shares_to_move {
-            panic_with_error!(&env, Error::InsufficientShares);
-        }
-
-        let new_from_shares = from_shares
-            .checked_sub(shares_to_move)
-            .unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
-        write_shares(&env, &from, new_from_shares);
-
-        let to_shares = read_shares(&env, &to);
-        let new_to_shares = to_shares
-            .checked_add(shares_to_move)
-            .unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
-        write_shares(&env, &to, new_to_shares);
-
-        let remaining_allowance = allowance
-            .checked_sub(amount)
-            .unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
-        write_allowance(&env, &from, &spender, remaining_allowance);
+        Base::set_metadata(&env, decimals, name, symbol);
     }
 
     pub fn mint(env: Env, to: Address, amount: i128) {
@@ -191,6 +159,8 @@ impl RUsdToken {
             .checked_add(shares_to_mint)
             .unwrap_or_else(|| panic_with_error!(&env, Error::Overflow));
         write_total_shares(&env, new_total_shares);
+
+        emit_mint(&env, &to, amount);
     }
 
     pub fn burn(env: Env, from: Address, amount: i128) {
@@ -222,6 +192,12 @@ impl RUsdToken {
         let usdc = usdc_client(&env);
         usdc.transfer(&contract, &from, &usdc_out);
     }
+}
+
+#[default_impl]
+#[contractimpl]
+impl FungibleToken for RUsdToken {
+    type ContractType = RebasingOverrides;
 }
 
 fn read_config(env: &Env) -> Config {
@@ -257,22 +233,6 @@ fn write_shares(env: &Env, owner: &Address, shares: i128) {
         env.storage().instance().remove(&key);
     } else {
         env.storage().instance().set(&key, &shares);
-    }
-}
-
-fn read_allowance(env: &Env, owner: &Address, spender: &Address) -> i128 {
-    env.storage()
-        .instance()
-        .get(&DataKey::Allowance(owner.clone(), spender.clone()))
-        .unwrap_or(0)
-}
-
-fn write_allowance(env: &Env, owner: &Address, spender: &Address, amount: i128) {
-    let key = DataKey::Allowance(owner.clone(), spender.clone());
-    if amount == 0 {
-        env.storage().instance().remove(&key);
-    } else {
-        env.storage().instance().set(&key, &amount);
     }
 }
 

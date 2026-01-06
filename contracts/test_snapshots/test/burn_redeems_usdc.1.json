@@ -1,8 +1,7 @@
 {
   "generators": {
     "address": 6,
-    "nonce": 0,
-    "mux_id": 0
+    "nonce": 0
   },
   "auth": [
     [],
@@ -25,7 +24,10 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
                 {
-                  "i128": "100"
+                  "i128": {
+                    "hi": 0,
+                    "lo": 100
+                  }
                 },
                 {
                   "u32": 200
@@ -50,7 +52,10 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                 },
                 {
-                  "i128": "100"
+                  "i128": {
+                    "hi": 0,
+                    "lo": 100
+                  }
                 }
               ]
             }
@@ -72,7 +77,10 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                 },
                 {
-                  "i128": "40"
+                  "i128": {
+                    "hi": 0,
+                    "lo": 40
+                  }
                 }
               ]
             }
@@ -87,7 +95,7 @@
     []
   ],
   "ledger": {
-    "protocol_version": 23,
+    "protocol_version": 22,
     "sequence_number": 100,
     "timestamp": 0,
     "network_id": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -131,7 +139,10 @@
                           ]
                         },
                         "val": {
-                          "i128": "60"
+                          "i128": {
+                            "hi": 0,
+                            "lo": 60
+                          }
                         }
                       },
                       {
@@ -146,7 +157,10 @@
                           ]
                         },
                         "val": {
-                          "i128": "940"
+                          "i128": {
+                            "hi": 0,
+                            "lo": 940
+                          }
                         }
                       }
                     ]
@@ -184,11 +198,7 @@
                     "storage": [
                       {
                         "key": {
-                          "vec": [
-                            {
-                              "symbol": "Config"
-                            }
-                          ]
+                          "symbol": "METADATA"
                         },
                         "val": {
                           "map": [
@@ -215,7 +225,20 @@
                               "val": {
                                 "string": "rUSD"
                               }
-                            },
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "Config"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "map": [
                             {
                               "key": {
                                 "symbol": "usdc_contract_id"
@@ -239,7 +262,10 @@
                           ]
                         },
                         "val": {
-                          "i128": "60"
+                          "i128": {
+                            "hi": 0,
+                            "lo": 60
+                          }
                         }
                       },
                       {
@@ -251,7 +277,10 @@
                           ]
                         },
                         "val": {
-                          "i128": "60"
+                          "i128": {
+                            "hi": 0,
+                            "lo": 60
+                          }
                         }
                       }
                     ]
@@ -270,7 +299,7 @@
             "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
             "key": {
               "ledger_key_nonce": {
-                "nonce": "801925984706572462"
+                "nonce": 801925984706572462
               }
             },
             "durability": "temporary"
@@ -285,7 +314,7 @@
                 "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
                 "key": {
                   "ledger_key_nonce": {
-                    "nonce": "801925984706572462"
+                    "nonce": 801925984706572462
                   }
                 },
                 "durability": "temporary",
@@ -303,7 +332,7 @@
             "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
             "key": {
               "ledger_key_nonce": {
-                "nonce": "1033654523790656264"
+                "nonce": 1033654523790656264
               }
             },
             "durability": "temporary"
@@ -318,7 +347,7 @@
                 "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
                 "key": {
                   "ledger_key_nonce": {
-                    "nonce": "1033654523790656264"
+                    "nonce": 1033654523790656264
                   }
                 },
                 "durability": "temporary",
@@ -336,7 +365,7 @@
             "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
             "key": {
               "ledger_key_nonce": {
-                "nonce": "5541220902715666415"
+                "nonce": 5541220902715666415
               }
             },
             "durability": "temporary"
@@ -351,7 +380,7 @@
                 "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
                 "key": {
                   "ledger_key_nonce": {
-                    "nonce": "5541220902715666415"
+                    "nonce": 5541220902715666415
                   }
                 },
                 "durability": "temporary",

@@ -1,8 +1,7 @@
 {
   "generators": {
     "address": 6,
-    "nonce": 0,
-    "mux_id": 0
+    "nonce": 0
   },
   "auth": [
     [],
@@ -13,7 +12,7 @@
     []
   ],
   "ledger": {
-    "protocol_version": 23,
+    "protocol_version": 22,
     "sequence_number": 100,
     "timestamp": 0,
     "network_id": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -79,11 +78,7 @@
                     "storage": [
                       {
                         "key": {
-                          "vec": [
-                            {
-                              "symbol": "Config"
-                            }
-                          ]
+                          "symbol": "METADATA"
                         },
                         "val": {
                           "map": [
@@ -110,7 +105,20 @@
                               "val": {
                                 "string": "rUSD"
                               }
-                            },
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "Config"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "map": [
                             {
                               "key": {
                                 "symbol": "usdc_contract_id"

@@ -1,8 +1,7 @@
 {
   "generators": {
     "address": 6,
-    "nonce": 0,
-    "mux_id": 0
+    "nonce": 0
   },
   "auth": [
     [],
@@ -27,7 +26,10 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
                 {
-                  "i128": "100"
+                  "i128": {
+                    "hi": 0,
+                    "lo": 100
+                  }
                 },
                 {
                   "u32": 200
@@ -52,7 +54,10 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                 },
                 {
-                  "i128": "100"
+                  "i128": {
+                    "hi": 0,
+                    "lo": 100
+                  }
                 }
               ]
             }
@@ -77,7 +82,10 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
                 {
-                  "i128": "50"
+                  "i128": {
+                    "hi": 0,
+                    "lo": 50
+                  }
                 },
                 {
                   "u32": 200
@@ -102,7 +110,10 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                 },
                 {
-                  "i128": "50"
+                  "i128": {
+                    "hi": 0,
+                    "lo": 50
+                  }
                 }
               ]
             }
@@ -127,7 +138,10 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
                 {
-                  "i128": "15"
+                  "i128": {
+                    "hi": 0,
+                    "lo": 15
+                  }
                 }
               ]
             }
@@ -141,7 +155,7 @@
     []
   ],
   "ledger": {
-    "protocol_version": 23,
+    "protocol_version": 22,
     "sequence_number": 100,
     "timestamp": 0,
     "network_id": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -185,7 +199,10 @@
                           ]
                         },
                         "val": {
-                          "i128": "165"
+                          "i128": {
+                            "hi": 0,
+                            "lo": 165
+                          }
                         }
                       },
                       {
@@ -200,7 +217,10 @@
                           ]
                         },
                         "val": {
-                          "i128": "900"
+                          "i128": {
+                            "hi": 0,
+                            "lo": 900
+                          }
                         }
                       },
                       {
@@ -215,7 +235,10 @@
                           ]
                         },
                         "val": {
-                          "i128": "950"
+                          "i128": {
+                            "hi": 0,
+                            "lo": 950
+                          }
                         }
                       },
                       {
@@ -230,7 +253,10 @@
                           ]
                         },
                         "val": {
-                          "i128": "985"
+                          "i128": {
+                            "hi": 0,
+                            "lo": 985
+                          }
                         }
                       }
                     ]
@@ -268,11 +294,7 @@
                     "storage": [
                       {
                         "key": {
-                          "vec": [
-                            {
-                              "symbol": "Config"
-                            }
-                          ]
+                          "symbol": "METADATA"
                         },
                         "val": {
                           "map": [
@@ -299,7 +321,20 @@
                               "val": {
                                 "string": "rUSD"
                               }
-                            },
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "Config"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "map": [
                             {
                               "key": {
                                 "symbol": "usdc_contract_id"
@@ -323,7 +358,10 @@
                           ]
                         },
                         "val": {
-                          "i128": "100"
+                          "i128": {
+                            "hi": 0,
+                            "lo": 100
+                          }
                         }
                       },
                       {
@@ -338,7 +376,10 @@
                           ]
                         },
                         "val": {
-                          "i128": "50"
+                          "i128": {
+                            "hi": 0,
+                            "lo": 50
+                          }
                         }
                       },
                       {
@@ -350,7 +391,10 @@
                           ]
                         },
                         "val": {
-                          "i128": "150"
+                          "i128": {
+                            "hi": 0,
+                            "lo": 150
+                          }
                         }
                       }
                     ]
@@ -369,7 +413,7 @@
             "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
             "key": {
               "ledger_key_nonce": {
-                "nonce": "801925984706572462"
+                "nonce": 801925984706572462
               }
             },
             "durability": "temporary"
@@ -384,7 +428,7 @@
                 "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
                 "key": {
                   "ledger_key_nonce": {
-                    "nonce": "801925984706572462"
+                    "nonce": 801925984706572462
                   }
                 },
                 "durability": "temporary",
@@ -402,7 +446,7 @@
             "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
             "key": {
               "ledger_key_nonce": {
-                "nonce": "5541220902715666415"
+                "nonce": 5541220902715666415
               }
             },
             "durability": "temporary"
@@ -417,7 +461,7 @@
                 "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
                 "key": {
                   "ledger_key_nonce": {
-                    "nonce": "5541220902715666415"
+                    "nonce": 5541220902715666415
                   }
                 },
                 "durability": "temporary",
@@ -435,7 +479,7 @@
             "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4",
             "key": {
               "ledger_key_nonce": {
-                "nonce": "1033654523790656264"
+                "nonce": 1033654523790656264
               }
             },
             "durability": "temporary"
@@ -450,7 +494,7 @@
                 "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4",
                 "key": {
                   "ledger_key_nonce": {
-                    "nonce": "1033654523790656264"
+                    "nonce": 1033654523790656264
                   }
                 },
                 "durability": "temporary",
@@ -468,7 +512,7 @@
             "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4",
             "key": {
               "ledger_key_nonce": {
-                "nonce": "4837995959683129791"
+                "nonce": 4837995959683129791
               }
             },
             "durability": "temporary"
@@ -483,7 +527,7 @@
                 "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4",
                 "key": {
                   "ledger_key_nonce": {
-                    "nonce": "4837995959683129791"
+                    "nonce": 4837995959683129791
                   }
                 },
                 "durability": "temporary",
@@ -501,7 +545,7 @@
             "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK3IM",
             "key": {
               "ledger_key_nonce": {
-                "nonce": "2032731177588607455"
+                "nonce": 2032731177588607455
               }
             },
             "durability": "temporary"
@@ -516,7 +560,7 @@
                 "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK3IM",
                 "key": {
                   "ledger_key_nonce": {
-                    "nonce": "2032731177588607455"
+                    "nonce": 2032731177588607455
                   }
                 },
                 "durability": "temporary",

@@ -971,6 +971,10 @@ version = "0.1.0"
 dependencies = [
  "derive_arbitrary",
  "soroban-sdk",
+ "stellar-access",
+ "stellar-contract-utils",
+ "stellar-macros",
+ "stellar-tokens",
 ]
 
 [[package]]
@@ -1343,6 +1347,35 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
+name = "stellar-access"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b5345cb2ba75b98f4b355fc95952e418046e9fe46e4fd94648c719993511a29d"
+dependencies = [
+ "soroban-sdk",
+]
+
+[[package]]
+name = "stellar-contract-utils"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4fc596a92adf2bbfbc6022c5d218c9bace96554de95e350e38e9da4a5a5ea77d"
+dependencies = [
+ "soroban-sdk",
+]
+
+[[package]]
+name = "stellar-macros"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bcc533c344e11f77f34f03e7cdc8d70da83784c746953bfd4b2d62f5423130ac"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.113",
+]
+
+[[package]]
 name = "stellar-strkey"
 version = "0.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1350,6 +1383,16 @@ checksum = "ee1832fb50c651ad10f734aaf5d31ca5acdfb197a6ecda64d93fcdb8885af913"
 dependencies = [
  "crate-git-revision",
  "data-encoding",
+]
+
+[[package]]
+name = "stellar-tokens"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d281a4ff1fa1087782ce95312444035904b62b59450a591c94ecd35b696de333"
+dependencies = [
+ "soroban-sdk",
+ "stellar-contract-utils",
 ]
 
 [[package]]
