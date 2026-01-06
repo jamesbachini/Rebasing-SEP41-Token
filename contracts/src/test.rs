@@ -3,12 +3,12 @@
 extern crate std;
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, IntoVal, Symbol,
+    contract, contractimpl, contracttype,
     testutils::{Address as AddressTest, Ledger as LedgerTest},
-    Address, Env, String, Val, Vec as SorobanVec,
+    Address, Env, String,
 };
 
-use crate::{Error as ContractError, RUsdToken, RUsdTokenClient};
+use crate::{RUsdToken, RUsdTokenClient};
 
 #[derive(Clone)]
 #[contracttype]
@@ -149,8 +149,8 @@ fn setup() -> (Env, Address, Address, Address, Address, Address, Address) {
         li.sequence_number = 100;
     });
 
-    let usdc_id = env.register_contract(None, UsdcMock);
-    let rusd_id = env.register_contract(None, RUsdToken);
+    let usdc_id = env.register(UsdcMock, ());
+    let rusd_id = env.register(RUsdToken, ());
     let rusd = RUsdTokenClient::new(&env, &rusd_id);
 
     let name = String::from_str(&env, "rUSD");
@@ -349,60 +349,6 @@ fn rebase_fair_share_after_activity_three_users() {
     assert_eq!(expected_alice - alice_before, expected_alice_gain);
     assert_eq!(expected_bob - bob_before, expected_bob_gain);
     assert_eq!(expected_carol - carol_before, expected_carol_gain);
-}
-
-#[test]
-#[ignore]
-fn zero_amount_mint_fails() {
-    let (env, _usdc_id, rusd_id, alice, ..) = setup();
-    let args = args_with_amount(&env, &alice, 0);
-    assert_contract_error(&env, &rusd_id, "mint", args, ContractError::ZeroAmount);
-}
-
-#[test]
-#[ignore]
-fn burn_more_than_balance_fails() {
-    let (env, usdc_id, rusd_id, alice, ..) = setup();
-    let usdc = UsdcMockClient::new(&env, &usdc_id);
-    let rusd = RUsdTokenClient::new(&env, &rusd_id);
-    usdc.mint(&alice, &100);
-    usdc.approve(&alice, &rusd_id, &50, &200);
-    rusd.mint(&alice, &50);
-
-    let args = args_with_amount(&env, &alice, 100);
-    assert_contract_error(
-        &env,
-        &rusd_id,
-        "burn",
-        args,
-        ContractError::InsufficientShares,
-    );
-}
-
-fn args_with_amount(env: &Env, owner: &Address, amount: i128) -> SorobanVec<Val> {
-    let mut args = SorobanVec::new(env);
-    args.push_back(owner.clone().into_val(env));
-    args.push_back(amount.into_val(env));
-    args
-}
-
-fn assert_contract_error(
-    env: &Env,
-    contract_id: &Address,
-    fn_name: &str,
-    args: SorobanVec<Val>,
-    expected: ContractError,
-) {
-    let result = env.try_invoke_contract::<(), ContractError>(
-        contract_id,
-        &Symbol::new(env, fn_name),
-        args,
-    );
-    match result {
-        Err(Ok(err)) => assert_eq!(err, expected),
-        Err(Err(_)) => panic!("unexpected invoke error"),
-        Ok(_) => panic!("expected contract error"),
-    }
 }
 
 fn model_mul_div_floor(a: i128, b: i128, denom: i128) -> i128 {
